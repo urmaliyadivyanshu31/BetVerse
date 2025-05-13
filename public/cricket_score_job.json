@@ -1,0 +1,16 @@
+[
+  {
+    "tasks": [
+      {
+        "httpTask": {
+          "url": "https://api.cricapi.com/v1/currentMatches?apikey=4a356387-ac94-46c9-ba12-2c38674edb8c   "
+        }
+      },
+      {
+        "jsonParseTask": {
+          "path": "$.data[0].score"
+        }
+      }
+    ]
+  }
+]
