@@ -40,7 +40,13 @@ interface RiskBadgeProps {
 const RiskBadge = ({ level, className }: RiskBadgeProps) => {
   const { color, icon, label } = RISK_LEVELS[level];
   return (
-    <span className={`inline-flex items-center px-2 py-1 rounded-full text-sm ${color} ${className}`}>
+    <span className={cn(
+      "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border transition-colors",
+      color === "bg-green-100 text-green-800" && "bg-green-50 text-green-700 border-green-200",
+      color === "bg-yellow-100 text-yellow-800" && "bg-yellow-50 text-yellow-700 border-yellow-200",
+      color === "bg-red-100 text-red-800" && "bg-red-50 text-red-700 border-red-200",
+      className
+    )}>
       {icon} {label}
     </span>
   );
@@ -56,33 +62,32 @@ const formatAIResponse = (content: string): JSX.Element => {
   ];
   
   let formattedContent = content;
-  
-  // Replace section headers with styled versions
+    // Replace section headers with enhanced styled versions
   sections.forEach(section => {
     formattedContent = formattedContent.replace(
       new RegExp(`(${section.label}|${section.regex.source})[:\\s]*`, 'i'),
-      `<div class="flex items-center gap-2 font-bold text-primary mt-4 mb-2 bg-primary/5 p-2 rounded-md">
-        <span>${section.icon}</span>
-        <span>${section.label}:</span>
+      `<div class="flex items-center gap-3 font-bold text-primary mt-6 mb-4 bg-gradient-to-r from-primary/10 to-transparent p-4 rounded-lg border border-primary/10">
+        <div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+          <span class="text-lg">${section.icon}</span>
+        </div>
+        <span class="text-base tracking-wide">${section.label}</span>
       </div>`
     );
   });
-  
-  // Style risk levels with custom component markup
+  // Style risk levels with modern visual indicators
   formattedContent = formattedContent
-    .replace(/🟢\s*Low Risk/g, '<div class="risk-badge low">🟢 Low Risk</div>')
-    .replace(/🟡\s*Medium Risk/g, '<div class="risk-badge medium">🟡 Medium Risk</div>')
-    .replace(/🔴\s*High Risk/g, '<div class="risk-badge high">🔴 High Risk</div>');
-  
-  // Style odds and statistics
+    .replace(/🟢\s*Low Risk/g, '<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50/80 text-green-700 ring-1 ring-green-200/50 font-medium text-sm shadow-sm hover:bg-green-50 transition-colors"><span class="h-2 w-2 rounded-full bg-green-500"></span>Low Risk</div>')
+    .replace(/🟡\s*Medium Risk/g, '<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-50/80 text-yellow-700 ring-1 ring-yellow-200/50 font-medium text-sm shadow-sm hover:bg-yellow-50 transition-colors"><span class="h-2 w-2 rounded-full bg-yellow-500"></span>Medium Risk</div>')
+    .replace(/🔴\s*High Risk/g, '<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50/80 text-red-700 ring-1 ring-red-200/50 font-medium text-sm shadow-sm hover:bg-red-50 transition-colors"><span class="h-2 w-2 rounded-full bg-red-500"></span>High Risk</div>');
+    // Style odds and statistics with modern indicators
   formattedContent = formattedContent
-    .replace(/(\d+(?:\.\d+)?%)/g, '<span class="text-primary font-semibold">$1</span>')
-    .replace(/(\d+\.\d+)(?:\s*odds)/g, '<span class="font-mono text-primary">$1</span>');
+    .replace(/(\d+(?:\.\d+)?%)/g, '<span class="inline-flex items-center gap-1"><TrendingUp className="h-4 w-4 text-primary" /><span class="text-primary font-bold">$1</span></span>')
+    .replace(/(\d+\.\d+)(?:\s*odds)/g, '<span class="inline-block font-mono text-primary font-bold bg-primary/5 px-3 py-1 rounded-md shadow-sm hover:bg-primary/10 transition-colors">$1</span>');
   
-  // Style key match details
+  // Style key match details with improved hierarchy
   formattedContent = formattedContent.replace(
     /(Head-to-head|Recent Form|Key Stats|Team News):/g,
-    '<span class="font-semibold text-primary">$1:</span>'
+    '<span class="font-bold text-primary block mt-3 mb-2 text-sm uppercase tracking-wide">$1:</span>'
   );
   
   // Convert line breaks and lists
@@ -91,8 +96,8 @@ const formatAIResponse = (content: string): JSX.Element => {
     .replace(/\n/g, '<br>');
   
   return (
-    <div className="prose prose-sm max-w-none [&_.risk-badge]:inline-flex [&_.risk-badge]:items-center [&_.risk-badge]:px-2 [&_.risk-badge]:py-1 [&_.risk-badge]:rounded-full [&_.risk-badge]:text-sm [&_.risk-badge.low]:bg-green-100 [&_.risk-badge.low]:text-green-800 [&_.risk-badge.medium]:bg-yellow-100 [&_.risk-badge.medium]:text-yellow-800 [&_.risk-badge.high]:bg-red-100 [&_.risk-badge.high]:text-red-800">
-      <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
+    <div className="prose prose-sm max-w-none [&_.risk-badge]:inline-flex [&_.risk-badge]:items-center [&_.risk-badge]:px-2 [&_.risk-badge]:py-1 [&_.risk-badge]:rounded-full [&_.risk-badge]:text-sm [&_.risk-badge.low]:bg-green-100 [&_.risk-badge.low]:text-green-800 [&_.risk-badge.medium]:bg-yellow-100 [&_.risk-badge.medium]:text-yellow-800 [&_.risk-badge.high]:bg-red-100 [&_.risk-badge.high]:text-red-800 [&_ul]:mt-4 [&_ul]:space-y-2 [&_li]:flex [&_li]:items-start [&_li]:gap-2 [&_li]:before:content-['•'] [&_li]:before:text-primary [&_li]:before:mr-2">
+      <div className="[&_a]:text-primary [&_strong]:text-primary [&_strong]:font-semibold [&_ul]:space-y-1 [&_li]:ml-4" dangerouslySetInnerHTML={{ __html: formattedContent }} />
     </div>
   );
 };
@@ -219,26 +224,31 @@ export default function AIBettingAssistant({ className, initialContext, sport, c
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted'
           }`}
-        >
-          {message.role === 'user' ? (
-            <User className="h-4 w-4" />
+        >          {message.role === 'user' ? (
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+              <User className="h-4 w-4 text-primary-foreground" />
+            </div>
           ) : (
-            <Avatar>
+            <Avatar className="h-8 w-8 ring-2 ring-primary/20">
               <AvatarImage src="/ai-assistant-avatar.png" alt="AI" />
-              <AvatarFallback>
-                <Bot className="h-4 w-4" />
+              <AvatarFallback className="bg-primary/5">
+                <Sparkles className="h-4 w-4 text-primary" />
               </AvatarFallback>
             </Avatar>
           )}
         </div>
         <div
-          className={`rounded-lg p-3 max-w-[80%] ${
+          className={cn(
+            "rounded-xl p-4 max-w-[80%] shadow-sm",
             message.role === 'user'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted'
-          }`}
+              ? 'bg-primary text-primary-foreground ml-auto'
+              : 'bg-card border border-border/50'
+          )}
         >
-          <div className="prose prose-sm dark:prose-invert">
+          <div className={cn(
+            "prose prose-sm",
+            message.role === 'user' ? 'prose-invert' : ''
+          )}>
             {message.role === 'assistant' 
               ? formatAIResponse(message.content)
               : <p>{message.content}</p>
@@ -249,18 +259,19 @@ export default function AIBettingAssistant({ className, initialContext, sport, c
     );
   };
 
-  return (
-    <Card className={cn("flex flex-col", compact ? "h-[600px]" : "h-full", className)}>
-      <CardHeader className="px-4 py-2 border-b">
+  return (    <Card className={cn("flex flex-col shadow-lg", compact ? "h-[600px]" : "h-full", className)}>
+      <CardHeader className="px-6 py-4 border-b bg-gradient-to-r from-primary/10 to-transparent">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10 ring-2 ring-primary/20">
               <AvatarImage src="/ai-assistant-avatar.png" />
-              <AvatarFallback>AI</AvatarFallback>
+              <AvatarFallback className="bg-primary/5">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-sm font-medium">AI Betting Assistant</CardTitle>
-              <p className="text-xs text-muted-foreground">Powered by advanced AI</p>
+              <CardTitle className="text-base font-bold">AI Betting Assistant</CardTitle>
+              <p className="text-sm text-muted-foreground">Analyzing matches & odds in real-time</p>
             </div>
           </div>
           {messages.length > 1 && (
@@ -268,57 +279,67 @@ export default function AIBettingAssistant({ className, initialContext, sport, c
               variant="ghost"
               size="sm"
               onClick={clearChat}
+              className="hover:bg-primary/5"
             >
-              <RefreshCw className="h-4 w-4 mr-1" />
-              Clear
+              <RefreshCw className="h-4 w-4 mr-2" />
+              New Analysis
             </Button>
           )}
         </div>
       </CardHeader>
 
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4 mb-4">
+      <ScrollArea className="flex-1 px-6 py-4">
+        <div className="space-y-6 mb-4">
           {messages.map((message, index) => renderMessage(message, index))}
           {isLoading && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Bot className="h-4 w-4 animate-pulse" />
-              <span className="text-sm">Analyzing...</span>
+            <div className="flex items-center gap-3 text-muted-foreground bg-primary/5 p-3 rounded-lg animate-pulse">
+              <Bot className="h-5 w-5 text-primary" />
+              <span>Analyzing match data and generating insights...</span>
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
         {messages.length === 1 && (
-          <div className="grid grid-cols-2 gap-2 mt-4">
+          <div className="grid grid-cols-2 gap-3 mt-6">
             {SUGGESTIONS.map((suggestion, index) => (
               <Button
                 key={index}
                 variant="outline"
-                className="flex items-center justify-start gap-2 h-auto p-3 text-left"
+                className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-primary/5 hover:border-primary/20 transition-colors"
                 onClick={() => handleSuggestedQuestion(suggestion.text)}
               >
-                {suggestion.icon}
-                <span className="text-sm">{suggestion.text}</span>
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  {suggestion.icon}
+                </div>
+                <span className="font-medium">{suggestion.text}</span>
               </Button>
             ))}
           </div>
         )}
       </ScrollArea>
 
-      <CardFooter className="p-4 border-t">
-        <form onSubmit={handleSubmit} className="flex w-full gap-2">
+      <CardFooter className="p-6 border-t bg-card">
+        <form onSubmit={handleSubmit} className="flex w-full gap-3">
           <Input
-            placeholder="Ask about matches, odds, or betting strategies..."
+            placeholder="Ask about match analysis, predictions, or betting strategies..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
-            className="flex-1"
+            className="flex-1 h-11 px-4 border-primary/20 focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/70"
           />
-          <Button type="submit" disabled={isLoading || !input.trim()}>
+          <Button 
+            type="submit"
+            disabled={isLoading || !input.trim()}
+            className="h-11 px-6 bg-primary hover:bg-primary/90"
+          >
             {isLoading ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="h-5 w-5 animate-spin" />
             ) : (
-              <Send className="h-4 w-4" />
+              <>
+                <Send className="h-5 w-5 mr-2" />
+                Send
+              </>
             )}
           </Button>
         </form>
