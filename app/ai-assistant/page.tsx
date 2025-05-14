@@ -1,231 +1,223 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent } from "@/components/ui/card"
-import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
-import AIBettingAssistant from "@/components/ai-betting-assistant"
-import AIRecommendations from "@/components/ai-recommendations"
-import MatchPrediction from "@/components/match-prediction"
-import AnimatedBackground from "@/components/animated-background"
-import FadeInSection from "@/components/fade-in-section"
-import { MessagesSquare, Sparkles, TrendingUp, BarChart2, Zap } from "lucide-react"
+import { useState, FormEvent, useRef, useEffect } from 'react';
+import type { JSX } from 'react';
+import { AIAssistantResponse } from '@/app/api/ai-assistant/route';
+
+// Types for our component state
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 export default function AIAssistantPage() {
-  const [activeTab, setActiveTab] = useState("chat")
+  // State for handling messages, input, and loading state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Ref to scroll to bottom of messages
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Mock upcoming matches for demonstration
-  const upcomingMatches = [
-    {
-      id: "CR2001",
-      team1: "Mumbai Indians",
-      team2: "Chennai Super Kings",
-      team1Odds: "1.95",
-      team2Odds: "1.85",
-      drawOdds: "3.50",
-      sport: "cricket" as const,
-      matchDate: "2023-05-12",
-      venue: "Wankhede Stadium",
-      tournament: "IPL 2023",
-    },
-    {
-      id: "FB2001",
-      team1: "Manchester United",
-      team2: "Liverpool",
-      team1Odds: "2.25",
-      team2Odds: "1.65",
-      drawOdds: "3.20",
-      sport: "football" as const,
-      matchDate: "2023-05-14",
-      venue: "Old Trafford",
-      tournament: "Premier League",
-    },
-  ]
+  // Function to scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Effect to scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+  // Function to format the AI response with styled sections
+  const formatAIResponse = (content: string): JSX.Element => {
+    const sections = [
+      { label: 'Match Analysis', regex: /Match Analysis|Analysis|Short Analysis/i, icon: '📊' },
+      { label: 'Recommended Bets', regex: /Recommended Bet|Recommended Bets|Suggested Bet|Bet Types/i, icon: '🎯' },
+      { label: 'Risk Level', regex: /Risk Level|Risk Rating/i, icon: '⚠️' },
+      { label: 'Justification', regex: /Justification|Reasoning|Rationale/i, icon: '🤔' },
+      { label: 'Disclaimer', regex: /Disclaimer|Note|Important/i, icon: '⚠️' }
+    ];
+    
+    let formattedContent = content;
+    
+    // Replace section headers with styled versions
+    sections.forEach(section => {
+      formattedContent = formattedContent.replace(
+        new RegExp(`(${section.label}|${section.regex.source})[:\\s]*`, 'i'),
+        `<div class="flex items-center gap-2 font-bold text-primary mt-4 mb-2 bg-primary/5 p-2 rounded-md">
+          <span>${section.icon}</span>
+          <span>${section.label}:</span>
+        </div>`
+      );
+    });
+    
+    // Style risk levels
+    formattedContent = formattedContent
+      .replace(/🟢\s*Low Risk/g, '<span class="inline-flex items-center px-2 py-1 rounded-full text-sm bg-green-100 text-green-800">🟢 Low Risk</span>')
+      .replace(/🟡\s*Medium Risk/g, '<span class="inline-flex items-center px-2 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">🟡 Medium Risk</span>')
+      .replace(/🔴\s*High Risk/g, '<span class="inline-flex items-center px-2 py-1 rounded-full text-sm bg-red-100 text-red-800">🔴 High Risk</span>');
+    
+    // Style odds and percentages
+    formattedContent = formattedContent.replace(
+      /(\d+\.\d+)(?=\s*odds|\s*%|\))/g, 
+      '<span class="font-mono text-primary">$1</span>'
+    );
+    
+    // Convert line breaks to <br> tags while preserving lists
+    formattedContent = formattedContent
+      .replace(/\n\s*•/g, '<br>•')
+      .replace(/\n/g, '<br>');
+    
+    return <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formattedContent }} />;
+  };
+
+  // Function to handle form submission
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    
+    if (!input.trim()) return;
+    
+    // Add user message to state
+    const userMessage: Message = { role: 'user', content: input };
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Clear input and set loading state
+    setInput('');
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Call API
+      const response = await fetch('/api/ai-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: input }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get response from AI assistant');
+      }
+      
+      const data = await response.json() as AIAssistantResponse;
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Add AI response to messages
+      setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
+      
+    } catch (err) {
+      console.error('Error:', err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to render each message
+  const renderMessage = (message: Message, index: number) => {
+    return (
+      <div
+        key={index}
+        className={`p-4 rounded-lg mb-4 ${
+          message.role === 'user'
+            ? 'bg-blue-100 ml-auto max-w-[80%]'
+            : 'bg-gray-100 mr-auto max-w-[80%]'
+        }`}
+      >
+        <div className="font-semibold mb-1">
+          {message.role === 'user' ? 'You' : 'Betting Assistant'}
+        </div>
+        {message.role === 'assistant' ? (
+          formatAIResponse(message.content)
+        ) : (
+          <div>{message.content}</div>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <AnimatedBackground variant="dots" className="min-h-screen bg-background">
-      <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <FadeInSection>
-            <div className="flex items-center mb-6">
-              <Sparkles className="h-5 w-5 text-primary mr-2" />
-              <h1 className="text-3xl font-bold font-heading">AI Betting Assistant</h1>
+    <div className="container mx-auto max-w-4xl p-4">
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Betverse AI Sports Betting Assistant
+      </h1>
+      
+      {/* Welcome message when no messages exist */}
+      {messages.length === 0 && (
+        <div className="bg-emerald-50 p-6 rounded-lg mb-6 text-center">
+          <h2 className="text-xl font-semibold mb-2">Welcome to Your Sports Betting Assistant!</h2>
+          <p className="mb-4">
+            Ask me about upcoming matches, team analysis, or betting recommendations.
+          </p>
+          <div className="text-sm text-gray-600">
+            Try questions like:
+            <ul className="mt-2">
+              <li>"What bet should I place on today's IPL match?"</li>
+              <li>"Give me an analysis of Manchester United vs Chelsea."</li>
+              <li>"What are good bets for the NBA playoffs tonight?"</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {/* Messages section */}
+      <div className="bg-white rounded-lg shadow-md p-4 mb-4 min-h-[400px] max-h-[600px] overflow-y-auto">
+        <div className="flex flex-col space-y-4">
+          {messages.map((message, index) => renderMessage(message, index))}
+          
+          {/* Loading indicator */}
+          {isLoading && (
+            <div className="flex items-center space-x-2 text-gray-500">
+              <div className="animate-pulse">Thinking</div>
+              <div className="flex">
+                <span className="animate-bounce delay-75">.</span>
+                <span className="animate-bounce delay-150">.</span>
+                <span className="animate-bounce delay-300">.</span>
+              </div>
             </div>
-            <p className="text-gray-500 mb-8">
-              Get intelligent predictions, analysis, and personalized recommendations powered by advanced AI
-            </p>
-          </FadeInSection>
-
-          <FadeInSection delay={200}>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-              <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto">
-                <TabsTrigger
-                  value="chat"
-                  className="data-[state=active]:bg-primary/5 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none py-2 px-4"
-                >
-                  <MessagesSquare className="h-4 w-4 mr-2" />
-                  Chat Assistant
-                </TabsTrigger>
-                <TabsTrigger
-                  value="predictions"
-                  className="data-[state=active]:bg-primary/5 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none py-2 px-4"
-                >
-                  <BarChart2 className="h-4 w-4 mr-2" />
-                  Match Predictions
-                </TabsTrigger>
-                <TabsTrigger
-                  value="recommendations"
-                  className="data-[state=active]:bg-primary/5 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none py-2 px-4"
-                >
-                  <Zap className="h-4 w-4 mr-2" />
-                  Recommendations
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="chat" className="mt-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <div className="lg:col-span-2">
-                    <AIBettingAssistant className="shadow-md" />
-                  </div>
-                  <div className="space-y-6">
-                    <Card>
-                      <CardContent className="p-4">
-                        <h3 className="font-bold mb-3 flex items-center">
-                          <TrendingUp className="h-4 w-4 mr-2 text-primary" />
-                          How AI Can Help You
-                        </h3>
-                        <ul className="space-y-2 text-sm text-muted-foreground">
-                          <li className="flex items-start">
-                            <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 mt-0.5">
-                              1
-                            </span>
-                            <span>Ask for match predictions and analysis on upcoming fixtures</span>
-                          </li>
-                          <li className="flex items-start">
-                            <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 mt-0.5">
-                              2
-                            </span>
-                            <span>Get insights on team form, player performance, and historical records</span>
-                          </li>
-                          <li className="flex items-start">
-                            <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 mt-0.5">
-                              3
-                            </span>
-                            <span>Discover value bets and optimal betting strategies based on odds</span>
-                          </li>
-                          <li className="flex items-start">
-                            <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 mt-0.5">
-                              4
-                            </span>
-                            <span>Learn about betting concepts, terminology, and responsible betting practices</span>
-                          </li>
-                        </ul>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className="p-4">
-                        <h3 className="font-bold mb-3">Suggested Questions</h3>
-                        <ul className="space-y-2 text-sm">
-                          <li className="p-2 bg-primary/5 rounded-md hover:bg-primary/10 cursor-pointer transition-colors">
-                            "What factors should I consider when betting on IPL matches?"
-                          </li>
-                          <li className="p-2 bg-primary/5 rounded-md hover:bg-primary/10 cursor-pointer transition-colors">
-                            "Analyze the upcoming match between Mumbai Indians and Chennai Super Kings"
-                          </li>
-                          <li className="p-2 bg-primary/5 rounded-md hover:bg-primary/10 cursor-pointer transition-colors">
-                            "Explain how odds work and how to calculate potential winnings"
-                          </li>
-                          <li className="p-2 bg-primary/5 rounded-md hover:bg-primary/10 cursor-pointer transition-colors">
-                            "What's the difference between back and lay betting?"
-                          </li>
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="predictions" className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {upcomingMatches.map((match) => (
-                    <MatchPrediction
-                      key={match.id}
-                      team1={match.team1}
-                      team2={match.team2}
-                      team1Odds={match.team1Odds}
-                      team2Odds={match.team2Odds}
-                      drawOdds={match.drawOdds}
-                      sport={match.sport}
-                      matchDate={match.matchDate}
-                      venue={match.venue}
-                      tournament={match.tournament}
-                      className="shadow-md"
-                    />
-                  ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="recommendations" className="mt-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <div className="lg:col-span-2">
-                    <AIRecommendations className="shadow-md" />
-                  </div>
-                  <div>
-                    <Card>
-                      <CardContent className="p-4">
-                        <h3 className="font-bold mb-3">About AI Recommendations</h3>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Our AI analyzes thousands of data points, including team performance, player statistics, and
-                          historical matches to provide personalized recommendations tailored to your preferences.
-                        </p>
-                        <div className="space-y-4">
-                          <div className="border-t border-border pt-3">
-                            <h4 className="font-medium text-sm mb-2">Recommended Matches</h4>
-                            <p className="text-xs text-muted-foreground">
-                              Based on your betting history and preferences, we highlight matches you might be
-                              interested in.
-                            </p>
-                          </div>
-                          <div className="border-t border-border pt-3">
-                            <h4 className="font-medium text-sm mb-2">Value Bets</h4>
-                            <p className="text-xs text-muted-foreground">
-                              Our AI identifies potential value bets where the odds offered may be more favorable than
-                              the actual probability.
-                            </p>
-                          </div>
-                          <div className="border-t border-border pt-3">
-                            <h4 className="font-medium text-sm mb-2">Accuracy Rating</h4>
-                            <div className="flex items-center">
-                              <div className="flex items-center">
-                                {Array(4)
-                                  .fill(0)
-                                  .map((_, i) => (
-                                    <div
-                                      key={i}
-                                      className="w-2 h-6 bg-primary mr-0.5 rounded-sm"
-                                      style={{ opacity: 1 - i * 0.2 }}
-                                    ></div>
-                                  ))}
-                              </div>
-                              <span className="text-xs text-muted-foreground ml-2">
-                                Our AI recommendations have an average 78% accuracy rating
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </FadeInSection>
+          )}
+          
+          {/* Error message */}
+          {error && (
+            <div className="text-red-500 p-2 rounded bg-red-50">
+              Error: {error}
+            </div>
+          )}
+          
+          {/* Scroll anchor */}
+          <div ref={messagesEndRef} />
         </div>
       </div>
-      <Footer />
-    </AnimatedBackground>
-  )
+
+      {/* Input form */}
+      <form onSubmit={handleSubmit} className="flex space-x-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask about a match, team analysis, or betting recommendation..."
+          className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+          disabled={isLoading}
+        />
+        <button
+          type="submit"
+          disabled={isLoading || !input.trim()}
+          className="bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          {isLoading ? 'Sending...' : 'Send'}
+        </button>
+      </form>
+      
+      {/* Disclaimer at bottom */}
+      <div className="text-xs text-gray-500 mt-4 text-center">
+        Disclaimer: Betting involves risk. Always gamble responsibly and be aware that
+        predictions are not guarantees of outcomes.
+      </div>
+    </div>
+  );
 }
