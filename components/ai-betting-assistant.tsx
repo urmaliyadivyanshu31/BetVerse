@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils"
 
 // Types for our component state
 interface Message {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
@@ -133,7 +133,12 @@ const SUGGESTIONS: Suggestion[] = [
   },
 ];
 
-export default function AIBettingAssistant({ className, initialContext, sport, compact = false }: AIBettingAssistantProps) {
+export default function AIBettingAssistant({
+  className,
+  initialContext,
+  sport,
+  compact = false,
+}: AIBettingAssistantProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -145,39 +150,35 @@ export default function AIBettingAssistant({ className, initialContext, sport, c
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Function to scroll to bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Effect to scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // Function to handle form submission
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+  const handleSendMessage = async () => {
+    if (!input.trim() || isLoading) return;
     
-    if (!input.trim()) return;
-    
-    // Add user message to state
-    const userMessage: Message = { role: 'user', content: input };
+    const userMessage: Message = { role: 'user', content: input.trim() };
     setMessages(prev => [...prev, userMessage]);
-    
-    // Clear input and set loading state
     setInput('');
     setIsLoading(true);
     
     try {
-      // Call API
-      const response = await fetch('/api/ai-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: input }),
-      });
+      const response = await generateChatCompletion(
+        messages.map(m => ({ role: m.role, content: m.content })),
+        input.trim(),
+        initialContext || '',
+        sport || 'all'
+      );
       
       if (!response.ok) {
         throw new Error('Failed to get response from AI assistant');
@@ -189,161 +190,156 @@ export default function AIBettingAssistant({ className, initialContext, sport, c
         throw new Error(data.error);
       }
       
-      // Add AI response to messages
       setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
-      
     } catch (err) {
       console.error('Error:', err);
+      toast({
+        title: "Error",
+        description: "Failed to get response from AI assistant. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Function to handle clicking on suggested questions
-  const handleSuggestedQuestion = (question: string) => {
-    setInput(question);
+  const handleSuggestionClick = (suggestion: string) => {
+    setInput(suggestion);
   };
 
-  const clearChat = () => {
-    setMessages([messages[0]]);
-    setInput("");
-  };
-
-  // Function to render each message
-  const renderMessage = (message: Message, index: number) => {
-    return (
-      <div
-        key={index}
-        className={`flex items-start gap-3 ${
-          message.role === 'user' ? 'flex-row-reverse' : ''
-        }`}
-      >
-        <div
-          className={`h-8 w-8 rounded-full flex items-center justify-center ${
-            message.role === 'user'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted'
-          }`}
-        >          {message.role === 'user' ? (
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-              <User className="h-4 w-4 text-primary-foreground" />
-            </div>
-          ) : (
-            <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-              <AvatarImage src="/ai-assistant-avatar.png" alt="AI" />
-              <AvatarFallback className="bg-primary/5">
-                <Sparkles className="h-4 w-4 text-primary" />
-              </AvatarFallback>
-            </Avatar>
-          )}
-        </div>
-        <div
-          className={cn(
-            "rounded-xl p-4 max-w-[80%] shadow-sm",
-            message.role === 'user'
-              ? 'bg-primary text-primary-foreground ml-auto'
-              : 'bg-card border border-border/50'
-          )}
-        >
-          <div className={cn(
-            "prose prose-sm",
-            message.role === 'user' ? 'prose-invert' : ''
-          )}>
-            {message.role === 'assistant' 
-              ? formatAIResponse(message.content)
-              : <p>{message.content}</p>
-            }
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  return (    <Card className={cn("flex flex-col shadow-lg", compact ? "h-[600px]" : "h-full", className)}>
-      <CardHeader className="px-6 py-4 border-b bg-gradient-to-r from-primary/10 to-transparent">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 ring-2 ring-primary/20">
-              <AvatarImage src="/ai-assistant-avatar.png" />
-              <AvatarFallback className="bg-primary/5">
-                <Sparkles className="h-5 w-5 text-primary" />
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <CardTitle className="text-base font-bold">AI Betting Assistant</CardTitle>
-              <p className="text-sm text-muted-foreground">Analyzing matches & odds in real-time</p>
-            </div>
-          </div>
-          {messages.length > 1 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearChat}
-              className="hover:bg-primary/5"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              New Analysis
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <ScrollArea className="flex-1 px-6 py-4">
-        <div className="space-y-6 mb-4">
-          {messages.map((message, index) => renderMessage(message, index))}
-          {isLoading && (
-            <div className="flex items-center gap-3 text-muted-foreground bg-primary/5 p-3 rounded-lg animate-pulse">
-              <Bot className="h-5 w-5 text-primary" />
-              <span>Analyzing match data and generating insights...</span>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {messages.length === 1 && (
-          <div className="grid grid-cols-2 gap-3 mt-6">
-            {SUGGESTIONS.map((suggestion, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                className="flex items-center justify-start gap-3 h-auto p-4 text-left hover:bg-primary/5 hover:border-primary/20 transition-colors"
-                onClick={() => handleSuggestedQuestion(suggestion.text)}
-              >
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  {suggestion.icon}
+  return (
+    <Card className={`border-gray-200 shadow-sm overflow-hidden ${className}`}>
+      <CardContent className="p-0">
+        <div className={`flex flex-col ${compact ? "h-[400px]" : "h-[600px]"}`}>
+          <div className="bg-gradient-to-r from-primary/15 to-primary/5 px-4 py-3 border-b border-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+                  <AvatarImage src="/ai-assistant-avatar.png" alt="AI Assistant" />
+                  <AvatarFallback className="bg-primary/10">AI</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-medium text-sm">AI Betting Assistant</h3>
+                  <p className="text-xs text-muted-foreground">Powered by AI</p>
                 </div>
-                <span className="font-medium">{suggestion.text}</span>
-              </Button>
-            ))}
+              </div>
+              <div className="flex items-center space-x-1 px-2 py-1 rounded-full bg-primary/10 text-primary">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium">AI-Powered</span>
+              </div>
+            </div>
           </div>
-        )}
-      </ScrollArea>
 
-      <CardFooter className="p-6 border-t bg-card">
-        <form onSubmit={handleSubmit} className="flex w-full gap-3">
-          <Input
-            placeholder="Ask about match analysis, predictions, or betting strategies..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={isLoading}
-            className="flex-1 h-11 px-4 border-primary/20 focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted-foreground/70"
-          />
-          <Button 
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            className="h-11 px-6 bg-primary hover:bg-primary/90"
-          >
-            {isLoading ? (
-              <RefreshCw className="h-5 w-5 animate-spin" />
-            ) : (
-              <>
-                <Send className="h-5 w-5 mr-2" />
-                Send
-              </>
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages
+              .filter((m) => m.role === "user" || m.role === "assistant")
+              .map((message, index) => (
+                <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`flex items-start space-x-2 max-w-[80%] ${
+                      message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
+                    }`}
+                  >
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        message.role === "assistant" 
+                          ? "bg-gradient-to-br from-primary/20 to-primary/10 ring-2 ring-primary/20" 
+                          : "bg-gradient-to-br from-gray-100 to-gray-50"
+                      }`}
+                    >
+                      {message.role === "assistant" ? (
+                        <Bot className="h-4 w-4 text-primary" />
+                      ) : (
+                        <User className="h-4 w-4 text-gray-500" />
+                      )}
+                    </div>
+                    <div
+                      className={`p-3 rounded-lg shadow-sm transition-all ${
+                        message.role === "assistant"
+                          ? "bg-gradient-to-br from-white to-gray-50 border border-gray-200"
+                          : "bg-gradient-to-br from-primary to-primary/90 text-white"
+                      }`}
+                    >
+                      {message.role === "assistant" ? (
+                        formatAIResponse(message.content)
+                      ) : (
+                        <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                      )}
+                      <p
+                        className={`text-[10px] mt-1 ${
+                          message.role === "assistant" ? "text-gray-400" : "text-primary-100"
+                        }`}
+                      >
+                        {new Date().toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="flex items-start space-x-2 max-w-[80%]">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-primary/20 to-primary/10 ring-2 ring-primary/20">
+                    <Bot className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="p-3 rounded-lg bg-white border border-gray-200 shadow-sm">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-primary/40 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-primary/40 rounded-full animate-bounce delay-100"></div>
+                      <div className="w-2 h-2 bg-primary/40 rounded-full animate-bounce delay-200"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
-          </Button>
-        </form>
-      </CardFooter>
+            <div ref={messagesEndRef} />
+          </div>
+
+          <div className="p-3 border-t border-gray-200 bg-gradient-to-br from-gray-50 to-white">
+            {!compact && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {SUGGESTIONS.map((suggestion, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7 px-2 hover:bg-primary/5 transition-colors"
+                    onClick={() => handleSuggestionClick(suggestion.text)}
+                  >
+                    <div className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center mr-1.5">
+                      {suggestion.icon}
+                    </div>
+                    {suggestion.text}
+                  </Button>
+                ))}
+              </div>
+            )}
+            <div className="flex space-x-2">              <Input
+                placeholder="Ask about betting strategies, predictions, or analysis..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="flex-1 rounded-full bg-background text-foreground border-border hover:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary placeholder:text-muted-foreground"
+                disabled={isLoading}
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!input.trim() || isLoading}
+                className="rounded-full bg-primary hover:bg-primary/90 text-white shadow-sm"
+                size="icon"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="mt-2 text-xs text-gray-400 text-center">
+              AI predictions are for informational purposes only. Always bet responsibly.
+            </div>
+          </div>
+        </div>
+      </CardContent>
     </Card>
-  );
+  )
 }

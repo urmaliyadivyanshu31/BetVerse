@@ -41,7 +41,10 @@ Be data-driven, clear, and responsible in your advice. Never guarantee outcomes,
 
 // Define types for request and response
 export interface AIAssistantRequest {
-  message: string;
+  messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>;
+  userMessage: string;
+  context?: string;
+  sport?: string;
 }
 
 export interface AIAssistantResponse {
@@ -54,20 +57,40 @@ export async function POST(request: Request) {
     // Parse the request body
     const body = await request.json() as AIAssistantRequest;
     
-    if (!body.message || body.message.trim() === '') {
+    if (!body.userMessage || body.userMessage.trim() === '') {
       return NextResponse.json(
         { content: '', error: 'Message is required' } as AIAssistantResponse,
         { status: 400 }
       );
     }
+
+    // Prepare the messages array for the API call
+    const messages = [
+      { role: 'system' as const, content: SYSTEM_MESSAGE },
+      // If there's sport-specific context, add it
+      ...(body.sport && body.sport !== 'all' ? [
+        { 
+          role: 'system' as const, 
+          content: `Focus on ${body.sport} betting analysis and predictions.`
+        }
+      ] : []),
+      // If there's additional context, add it
+      ...(body.context ? [
+        { 
+          role: 'system' as const, 
+          content: body.context 
+        }
+      ] : []),
+      // Add the chat history
+      ...body.messages,
+      // Add the latest user message
+      { role: 'user' as const, content: body.userMessage }
+    ];
     
     // Call OpenAI API
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
-      messages: [
-        { role: 'system', content: SYSTEM_MESSAGE },
-        { role: 'user', content: body.message }
-      ],
+      model: 'gpt-4-turbo-preview',
+      messages,
       temperature: 0.4,
       max_tokens: 2000,
       presence_penalty: 0.1,
@@ -77,7 +100,7 @@ export async function POST(request: Request) {
 
     // Extract the assistant's response
     const responseContent = completion.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
-
+    
     // Return the response
     return NextResponse.json({ 
       content: responseContent 

@@ -22,47 +22,38 @@ const SPORT_SPECIFIC_PROMPTS = {
 
 // Types for chat messages
 export interface ChatMessage {
-  role: "user" | "assistant" | "system"
-  content: string
+  role: 'user' | 'assistant' | 'system';
+  content: string;
 }
 
-/**
- * Generate a chat completion using the Grok API
- * @param messages - Array of chat messages
- * @param sport - Optional sport to add context (cricket, football, basketball)
- * @returns Promise with the AI response
- */
-export async function generateChatCompletion(
-  messages: ChatMessage[], 
-  sport?: keyof typeof SPORT_SPECIFIC_PROMPTS
-): Promise<string> {
-  try {
-    // Add system context
-    const systemMessages = [
-      { role: 'system' as const, content: BETTING_ASSISTANT_PROMPT },
-      // Add sport-specific context if provided
-      ...(sport ? [{ role: 'system' as const, content: SPORT_SPECIFIC_PROMPTS[sport] }] : [])
-    ];
+const MAX_MESSAGES = 10; // Maximum number of messages to keep in context
 
-    const response = await fetch('/api/chat', {
+export async function generateChatCompletion(messages: ChatMessage[], userMessage: string, context: string = '', sport: string = 'all'): Promise<string> {
+  // Trim the chat history to prevent large payloads
+  const recentMessages = messages.slice(-MAX_MESSAGES);
+  
+  try {
+    const response = await fetch('/api/ai-assistant', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        messages: [
-          ...systemMessages,
-          ...messages
-        ]
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: recentMessages,
+        userMessage,
+        context,
+        sport
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to generate chat completion');
+      throw new Error('Failed to get response from AI assistant');
     }
 
     const data = await response.json();
     return data.content;
   } catch (error) {
-    console.error('Error in generateChatCompletion:', error);
+    console.error('Error generating chat completion:', error);
     throw error;
   }
 }

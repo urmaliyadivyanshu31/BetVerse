@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Zap, RefreshCw, AlertTriangle } from "lucide-react";
+import { Zap, RefreshCw, AlertTriangle, Brain, TrendingUp, Sparkles, BarChart2, Percent, Clock, DollarSign, ChevronRight } from "lucide-react";
 
 interface SportCategory {
   name: string;
@@ -12,13 +12,52 @@ interface SportCategory {
 }
 
 interface Recommendation {
+  id: string;
+  type: "high" | "medium" | "low";
+  title: string;
   match: string;
-  league: string;
-  recommendation: string;
-  riskLevel: 'Low' | 'Medium' | 'High';
-  odds: string;
+  prediction: string;
+  odds: number;
   confidence: number;
+  potentialReturn: number;
+  time: string;
 }
+
+const defaultRecommendations: Recommendation[] = [
+  {
+    id: "1",
+    type: "high",
+    title: "Match Winner",
+    match: "Liverpool vs Manchester United",
+    prediction: "Liverpool to Win",
+    odds: 1.85,
+    confidence: 85,
+    potentialReturn: 185,
+    time: "Today, 20:00"
+  },
+  {
+    id: "2",
+    type: "medium",
+    title: "Over/Under",
+    match: "Arsenal vs Chelsea",
+    prediction: "Over 2.5 Goals",
+    odds: 1.95,
+    confidence: 75,
+    potentialReturn: 195,
+    time: "Tomorrow, 15:30"
+  },
+  {
+    id: "3",
+    type: "low",
+    title: "Both Teams to Score",
+    match: "Barcelona vs Real Madrid",
+    prediction: "Yes",
+    odds: 1.75,
+    confidence: 65,
+    potentialReturn: 175,
+    time: "Tomorrow, 21:00"
+  }
+];
 
 export default function AIRecommendations({ className }: { className?: string }) {
   const [categories, setCategories] = useState<SportCategory[]>([
@@ -29,9 +68,9 @@ export default function AIRecommendations({ className }: { className?: string })
     { name: 'Horse Racing', active: false },
   ]);
   
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>(defaultRecommendations);
 
   // Function to get recommendations based on selected categories
   const getRecommendations = async () => {
@@ -83,12 +122,15 @@ export default function AIRecommendations({ className }: { className?: string })
       
       while ((match = recommendationRegex.exec(aiResponse)) !== null) {
         extractedRecommendations.push({
+          id: match[1],
+          type: match[5].toLowerCase() as "low" | "medium" | "high",
+          title: match[4],
           match: match[2],
-          league: match[3],
-          recommendation: match[4],
-          riskLevel: match[5] as 'Low' | 'Medium' | 'High',
-          odds: match[6],
-          confidence: parseInt(match[7], 10)
+          prediction: match[4],
+          odds: parseFloat(match[6]),
+          confidence: parseInt(match[7], 10),
+          potentialReturn: parseFloat(match[6]) * 100,
+          time: "Today, 20:00"
         });
       }
       
@@ -115,68 +157,86 @@ export default function AIRecommendations({ className }: { className?: string })
     
     if (sports.includes('Football')) {
       recommendations.push({
+        id: "1",
+        type: "medium",
+        title: "Match Winner",
         match: 'Manchester United vs Chelsea',
-        league: 'Premier League',
-        recommendation: 'Under 2.5 Goals',
-        riskLevel: 'Medium',
-        odds: '1.95',
-        confidence: 73
+        prediction: 'Under 2.5 Goals',
+        odds: 1.95,
+        confidence: 73,
+        potentialReturn: 195,
+        time: "Today, 20:00"
       });
     }
     
     if (sports.includes('Cricket')) {
       recommendations.push({
+        id: "2",
+        type: "low",
+        title: "Over/Under",
         match: 'Mumbai Indians vs Chennai Super Kings',
-        league: 'IPL',
-        recommendation: 'Over 165.5 Total Runs',
-        riskLevel: 'Low',
-        odds: '1.88',
-        confidence: 82
+        prediction: 'Over 165.5 Total Runs',
+        odds: 1.88,
+        confidence: 82,
+        potentialReturn: 188,
+        time: "Tomorrow, 15:30"
       });
     }
     
     if (sports.includes('Tennis')) {
       recommendations.push({
+        id: "3",
+        type: "low",
+        title: "Match Winner",
         match: 'Djokovic vs Nadal',
-        league: 'French Open',
-        recommendation: 'Nadal to Win',
-        riskLevel: 'Low',
-        odds: '1.75',
-        confidence: 85
+        prediction: 'Nadal to Win',
+        odds: 1.75,
+        confidence: 85,
+        potentialReturn: 175,
+        time: "Tomorrow, 21:00"
       });
     }
     
     if (sports.includes('Basketball')) {
       recommendations.push({
+        id: "4",
+        type: "medium",
+        title: "Spread",
         match: 'Lakers vs Warriors',
-        league: 'NBA',
-        recommendation: 'Warriors -4.5',
-        riskLevel: 'Medium',
-        odds: '1.90',
-        confidence: 68
+        prediction: 'Warriors -4.5',
+        odds: 1.90,
+        confidence: 68,
+        potentialReturn: 190,
+        time: "Today, 20:00"
       });
     }
     
     if (sports.includes('Horse Racing')) {
       recommendations.push({
+        id: "5",
+        type: "high",
+        title: "Match Winner",
         match: 'Royal Ascot - Gold Cup',
-        league: 'Grade 1',
-        recommendation: 'Back Stradivarius',
-        riskLevel: 'High',
-        odds: '3.50',
-        confidence: 60
+        prediction: 'Back Stradivarius',
+        odds: 3.50,
+        confidence: 60,
+        potentialReturn: 350,
+        time: "Tomorrow, 15:30"
       });
     }
     
     // If no specific sport matches or we need more recommendations
     while (recommendations.length < 3) {
       recommendations.push({
+        id: "6",
+        type: "medium",
+        title: "Match Winner",
         match: 'Popular Match of the Day',
-        league: 'Major League',
-        recommendation: 'Back Favorite Team',
-        riskLevel: 'Medium',
-        odds: '2.00',
-        confidence: 70
+        prediction: 'Back Favorite Team',
+        odds: 2.00,
+        confidence: 70,
+        potentialReturn: 200,
+        time: "Today, 20:00"
       });
     }
     
@@ -213,7 +273,24 @@ export default function AIRecommendations({ className }: { className?: string })
 
   return (
     <Card className={cn("h-full", className)}>
-      <CardContent className="p-0">
+      <CardHeader className="bg-gradient-to-r from-primary/15 to-primary/5 border-b border-border py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 ring-2 ring-primary/20 flex items-center justify-center">
+              <Brain className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-sm font-medium">AI Recommendations</CardTitle>
+              <CardDescription className="text-xs">Smart betting suggestions</CardDescription>
+            </div>
+          </div>
+          <div className="flex items-center space-x-1 px-2 py-1 rounded-full bg-primary/10 text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span className="text-xs font-medium">Top Picks</span>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="p-4">
         <div className="border-b p-4 flex justify-between items-center">
           <div className="flex items-center">
             <Zap className="h-5 w-5 text-primary mr-2" />
@@ -268,29 +345,52 @@ export default function AIRecommendations({ className }: { className?: string })
             </div>
           ) : (
             <div className="space-y-4">
-              {recommendations.map((rec, index) => (
-                <div key={index} className="border rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="font-medium">{rec.match}</h4>
-                      <div className="text-xs text-muted-foreground">{rec.league}</div>
+              {recommendations.map((rec) => (
+                <div
+                  key={rec.id}
+                  className="group p-4 rounded-lg bg-gradient-to-br from-black to-white-50 border border-gray-200 shadow-sm transition-all hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start space-x-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${getRecommendationStyle(rec.type)}`}>
+                        <TrendingUp className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <h4 className="text-sm font-medium">{rec.title}</h4>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${getConfidenceBadgeStyle(rec.type)}`}>
+                            {getConfidenceLabel(rec.type)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">{rec.match}</p>
+                        <div className="mt-2 flex flex-wrap gap-3">
+                          <div className="flex items-center text-xs text-gray-500">
+                            <Clock className="h-3.5 w-3.5 mr-1" />
+                            <span>{rec.time}</span>
+                          </div>
+                          <div className="flex items-center text-xs text-gray-500">
+                            <BarChart2 className="h-3.5 w-3.5 mr-1" />
+                            <span>{rec.prediction}</span>
+                          </div>
+                          <div className="flex items-center text-xs text-gray-500">
+                            <Percent className="h-3.5 w-3.5 mr-1" />
+                            <span>Odds: {rec.odds}</span>
+                          </div>
+                          <div className="flex items-center text-xs text-green-600">
+                            <DollarSign className="h-3.5 w-3.5 mr-1" />
+                            <span>Potential Return: ${rec.potentialReturn}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    {renderRiskLevel(rec.riskLevel)}
-                  </div>
-                  
-                  <div className="bg-muted p-3 rounded-md mb-3">
-                    <div className="font-medium text-sm">{rec.recommendation}</div>
-                    <div className="text-xs text-muted-foreground mt-1">Odds: {rec.odds}</div>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary" 
-                        style={{ width: `${rec.confidence}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-xs font-medium ml-2">{rec.confidence}% Confidence</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      View Details
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -311,4 +411,37 @@ export default function AIRecommendations({ className }: { className?: string })
       </CardContent>
     </Card>
   );
+}
+
+function getRecommendationStyle(type: "high" | "medium" | "low") {
+  switch (type) {
+    case "high":
+      return "bg-gradient-to-br from-green-100 to-green-50 text-green-600";
+    case "medium":
+      return "bg-gradient-to-br from-yellow-100 to-yellow-50 text-yellow-600";
+    case "low":
+      return "bg-gradient-to-br from-orange-100 to-orange-50 text-orange-600";
+  }
+}
+
+function getConfidenceBadgeStyle(type: "high" | "medium" | "low") {
+  switch (type) {
+    case "high":
+      return "bg-green-100 text-green-700";
+    case "medium":
+      return "bg-yellow-100 text-yellow-700";
+    case "low":
+      return "bg-orange-100 text-orange-700";
+  }
+}
+
+function getConfidenceLabel(type: "high" | "medium" | "low") {
+  switch (type) {
+    case "high":
+      return "High Confidence";
+    case "medium":
+      return "Medium Confidence";
+    case "low":
+      return "Low Confidence";
+  }
 }
