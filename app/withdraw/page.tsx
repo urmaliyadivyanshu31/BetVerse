@@ -9,13 +9,21 @@ import { useToast } from "@/components/ui/use-toast"
 import Navbar from "@/components/navbar"
 import { useWallet } from "@/components/wallet-provider"
 import { ArrowRight, DollarSign, RefreshCw } from "lucide-react"
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
+import bs58 from 'bs58';
+import { useWallet as useSolanaWallet } from '@solana/wallet-adapter-react';
 
 export default function WithdrawPage() {
-  const { isConnected, balance } = useWallet()
+  const { isConnected,publicKey } = useWallet()
   const { toast } = useToast()
   const [amount, setAmount] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState("usdc")
+  const [activeTab, setActiveTab] = useState("sol")
+  const [balance, setBalance] = useState({
+    
+    usdc: "1692.00",
+    sol: "100.00",
+  })
 
   const handleWithdraw = async () => {
     if (!isConnected) {
@@ -55,11 +63,72 @@ export default function WithdrawPage() {
 
     try {
       // Simulate transaction delay
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Import required Solana web3.js libraries
+
+      // SECURITY WARNING: Never put private keys in frontend code in production
+      // This should be handled by a secure backend service
+      const privateKey = process.env.NEXT_PUBLIC_TREASURY_PRIVATE_KEY;
+      if (!privateKey) {
+        throw new Error("Treasury private key not found");
+      }
+
+      // Get the user's wallet address
+      
+
+      // Set up Solana connection
+      const network = 'devnet';
+      const endpoint =`https://api.${network}.solana.com`;
+      const connection = new Connection(endpoint);
+
+      // Create keypair from private key
+      const fromWallet = Keypair.fromSecretKey(bs58.decode(privateKey));
+
+      // Create and send transaction
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: fromWallet.publicKey,
+          toPubkey: publicKey ? new PublicKey(publicKey) : new PublicKey(""),
+          lamports: Math.round(numAmount * LAMPORTS_PER_SOL),
+        })
+      );
+
+      // Send and confirm transaction
+      const signature = await connection.sendTransaction(
+        transaction, 
+        [fromWallet]
+      );
+      await connection.confirmTransaction(signature).then((confirmation) => {
+        if (confirmation.value.err) {
+          throw new Error("Transaction failed: " + confirmation.value.err.toString());
+        }
+        else {
+          console.log("Transaction confirmed:", signature);
+          setBalance((prevBalance) => {
+            const newBalance = { ...prevBalance };
+            if (activeTab === "usdc") {
+              newBalance.usdc = (Number.parseFloat(newBalance.usdc.replace(/,/g, "")) - numAmount).toFixed(2);
+            } else {
+              newBalance.sol = (Number.parseFloat(newBalance.sol) - numAmount).toFixed(2);
+            }
+            return newBalance;
+          }
+          );
+        }
+      });
+
+      // Create Solana Explorer link
+      const explorerLink = `https://explorer.solana.com/tx/${signature}?cluster=${network}`;
+
+      // Update the wallet balance in your app
+      // This would integrate with your wallet provider's refresh method
 
       toast({
         title: "Withdrawal Successful",
         description: `You've successfully withdrawn ${amount} ${activeTab.toUpperCase()} to your wallet.`,
+      })
+      toast({
+        title: "Transaction Complete",
+        description: `Transaction successful! View on Solana Explorer: ${explorerLink}`
       })
 
       setAmount("")
@@ -106,7 +175,6 @@ export default function WithdrawPage() {
               <CardContent>
                 <Tabs defaultValue="usdc" value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="mb-4">
-                    <TabsTrigger value="usdc">USDC</TabsTrigger>
                     <TabsTrigger value="sol">SOL</TabsTrigger>
                   </TabsList>
 
@@ -187,20 +255,7 @@ export default function WithdrawPage() {
                         </div>
                       </div>
 
-                      <div className="p-4 bg-gray-50 rounded-md">
-                        <div className="flex justify-between text-sm mb-2">
-                          <span className="text-gray-500">Amount</span>
-                          <span>{amount || "0.00"} SOL</span>
-                        </div>
-                        <div className="flex justify-between text-sm mb-2">
-                          <span className="text-gray-500">Network Fee</span>
-                          <span>~0.000005 SOL</span>
-                        </div>
-                        <div className="border-t border-gray-200 my-2 pt-2 flex justify-between font-medium">
-                          <span>You will receive</span>
-                          <span>{amount ? (Number.parseFloat(amount) - 0.000005).toFixed(6) : "0.00"} SOL</span>
-                        </div>
-                      </div>
+                      
 
                       <Button
                         onClick={handleWithdraw}

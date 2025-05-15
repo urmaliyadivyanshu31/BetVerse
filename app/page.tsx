@@ -9,7 +9,7 @@ import Image from "next/image"
 import AnimatedBackground from "@/components/animated-background"
 import FadeInSection from "@/components/fade-in-section"
 import BettingCard from "@/components/betting-card"
-import AIInsightsSection from "@/components/ai-insights-section"
+// import AIInsightsSection from "@/components/ai-insights-section"
 
 export default function Home() {
   return (
@@ -204,13 +204,13 @@ export default function Home() {
       </div>
 
       {/* AI Insights Section */}
-      <div className="container mx-auto px-4 py-12">
+      {/* <div className="container mx-auto px-4 py-12">
         <FadeInSection>
           <div className="max-w-4xl mx-auto">
             <AIInsightsSection />
           </div>
         </FadeInSection>
-      </div>
+      </div> */}
 
       {/* How It Works Section */}
       <div className="container mx-auto px-4 py-24">
