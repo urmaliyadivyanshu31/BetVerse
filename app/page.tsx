@@ -314,11 +314,11 @@ export default function Home() {
       </div>
 
       {/* AI Insights Section */}
-      <div className="container mx-auto px-4 py-12">
+      {/* <div className="container mx-auto px-4 py-12">
         <FadeInSection>
           <div className="max-w-4xl mx-auto">{/* <AIInsightsSection /> */}</div>
         </FadeInSection>
-      </div>
+      </div> */}
 
       {/* How It Works Section */}
       <div className="container mx-auto px-4 py-24">
