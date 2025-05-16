@@ -151,5 +151,4 @@ Follow us on Twitter: [@Under\_Score\_Sol](https://twitter.com/Under_Score_Sol)
 
 *Under\_Score — Bet Fair, Win Fast, On-Chain.*
 
-```
-```
+
