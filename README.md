@@ -73,8 +73,9 @@ Under_Score is a decentralized sports betting application built on the Solana bl
        }
    }
    ```
+   ### Prerequisites
 <p align="center">
-  <img src="https://ik.imagekit.io/d2v6okduo/image.png?updatedAt=1747424373332" alt="Flow_chart Logo" width="650"/>
+  <img src="https://ik.imagekit.io/d2v6okduo/image.png?updatedAt=1747424373332" alt="Flow_chart Logo" width="850"/>
 </p>
 
 ---
