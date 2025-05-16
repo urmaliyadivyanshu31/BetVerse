@@ -6,66 +6,95 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Navbar from "@/components/navbar"
-import { ArrowUpRight, DollarSign, TrendingUp, Trophy, Wallet } from "lucide-react"
+import { ArrowUpRight, DollarSign, TrendingUp, Trophy, Wallet, Camera } from "lucide-react"
 import TransactionHistory from "@/components/transaction-history"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("overview")
 
   return (
-    <main className="min-h-screen bg-[#f8f9fa]">
+    <main className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">My Profile</h1>
-            <p className="text-gray-500">Manage your account and view your betting history</p>
+        {/* User Profile Section */}
+        <div className="flex flex-col md:flex-row items-start gap-8 mb-12">
+          <div className="relative group">
+            <Avatar className="h-32 w-32 border-4 border-gray-800">
+              <AvatarImage src="https://avataaars.io/?avatarStyle=Transparent&topType=LongHairNotTooLong&accessoriesType=Blank&hairColor=BrownDark&facialHairType=BeardMajestic&facialHairColor=BrownDark&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Smile&skinColor=Pale" alt="User avatar" />
+              <AvatarFallback className="bg-gray-800 text-2xl">JD</AvatarFallback>
+            </Avatar>
+            <Button 
+              size="icon" 
+              variant="secondary" 
+              className="absolute bottom-0 right-0 rounded-full bg-gray-800 hover:bg-gray-700"
+            >
+              <Camera className="h-4 w-4" />
+            </Button>
           </div>
-          <div className="flex space-x-4">
-            <Button variant="outline" className="flex items-center">
-              <DollarSign className="mr-2 h-4 w-4" /> Add Funds
-            </Button>
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white flex items-center">
-              <Wallet className="mr-2 h-4 w-4" /> Withdraw
-            </Button>
+          <div className="flex-1">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">Singupalli Kartik</h1>
+                <p className="text-gray-400">@skartik1706</p>
+                <div className="flex items-center gap-4 mt-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400">Member since</span>
+                    <span className="text-white">Jan 2024</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400">Total Bets</span>
+                    <span className="text-white">42</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex space-x-4">
+                <Button variant="outline" className="flex items-center border-gray-700 text-white hover:bg-gray-800">
+                  <DollarSign className="mr-2 h-4 w-4" /> Add Funds
+                </Button>
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white flex items-center">
+                  <Wallet className="mr-2 h-4 w-4" /> Withdraw
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+          <Card className="bg-[#1a1a1a] border-gray-800">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Current Balance</p>
+                  <p className="text-sm text-gray-400">Current Balance</p>
                   <h3 className="text-2xl font-bold">$1,450.75</h3>
                 </div>
-                <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
+                <div className="h-12 w-12 bg-orange-900/20 rounded-full flex items-center justify-center">
                   <Wallet className="h-6 w-6 text-orange-500" />
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-[#1a1a1a] border-gray-800">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Active Bets</p>
+                  <p className="text-sm text-gray-400">Active Bets</p>
                   <h3 className="text-2xl font-bold">$350.00</h3>
                 </div>
-                <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <div className="h-12 w-12 bg-blue-900/20 rounded-full flex items-center justify-center">
                   <TrendingUp className="h-6 w-6 text-blue-500" />
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-[#1a1a1a] border-gray-800">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Total Winnings</p>
+                  <p className="text-sm text-gray-400">Total Winnings</p>
                   <h3 className="text-2xl font-bold">$2,780.50</h3>
                 </div>
-                <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                <div className="h-12 w-12 bg-green-900/20 rounded-full flex items-center justify-center">
                   <Trophy className="h-6 w-6 text-green-500" />
                 </div>
               </div>
@@ -74,23 +103,23 @@ export default function ProfilePage() {
         </div>
 
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-8">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="history">Betting History</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="settings">Account Settings</TabsTrigger>
+          <TabsList className="mb-8 bg-[#1a1a1a] border-gray-800">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-gray-800">Overview</TabsTrigger>
+            <TabsTrigger value="history" className="data-[state=active]:bg-gray-800">Betting History</TabsTrigger>
+            <TabsTrigger value="transactions" className="data-[state=active]:bg-gray-800">Transactions</TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-gray-800">Account Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card>
+              <Card className="bg-[#1a1a1a] border-gray-800">
                 <CardHeader>
                   <CardTitle className="text-xl">Recent Activity</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-start space-x-4">
-                      <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="h-10 w-10 bg-green-900/20 rounded-full flex items-center justify-center flex-shrink-0">
                         <Trophy className="h-5 w-5 text-green-500" />
                       </div>
                       <div className="flex-1">
@@ -98,8 +127,8 @@ export default function ProfilePage() {
                           <h4 className="font-medium">Bet Won</h4>
                           <span className="text-green-500 font-medium">+$45.60</span>
                         </div>
-                        <p className="text-sm text-gray-500">Mumbai Indians vs Chennai Super Kings</p>
-                        <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
+                        <p className="text-sm text-gray-400">Mumbai Indians vs Chennai Super Kings</p>
+                        <p className="text-xs text-gray-500 mt-1">2 hours ago</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-4">
@@ -132,64 +161,64 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div className="mt-6">
-                    <Button variant="ghost" size="sm" className="text-orange-500">
+                    <Button variant="ghost" size="sm" className="text-orange-500 hover:bg-gray-800">
                       View All Activity <ArrowUpRight className="ml-1 h-3 w-3" />
                     </Button>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-[#1a1a1a] border-gray-800">
                 <CardHeader>
                   <CardTitle className="text-xl">Active Bets</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="p-4 border border-gray-100 rounded-lg">
+                    <div className="p-4 border border-gray-800 rounded-lg">
                       <div className="flex justify-between items-center mb-2">
                         <h4 className="font-medium">RCB vs KKR</h4>
-                        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-full">Active</span>
+                        <span className="text-xs px-2 py-1 bg-blue-900/20 text-blue-400 rounded-full">Active</span>
                       </div>
-                      <p className="text-sm text-gray-500 mb-3">Bet on: Royal Challengers Bangalore</p>
+                      <p className="text-sm text-gray-400 mb-3">Bet on: Royal Challengers Bangalore</p>
                       <div className="flex justify-between text-sm">
                         <div>
-                          <p className="text-gray-500">Amount</p>
+                          <p className="text-gray-400">Amount</p>
                           <p className="font-medium">$150.00</p>
                         </div>
                         <div>
-                          <p className="text-gray-500">Odds</p>
+                          <p className="text-gray-400">Odds</p>
                           <p className="font-medium">2.10</p>
                         </div>
                         <div>
-                          <p className="text-gray-500">Potential Win</p>
+                          <p className="text-gray-400">Potential Win</p>
                           <p className="font-medium text-green-500">$315.00</p>
                         </div>
                       </div>
                     </div>
-                    <div className="p-4 border border-gray-100 rounded-lg">
+                    <div className="p-4 border border-gray-800 rounded-lg">
                       <div className="flex justify-between items-center mb-2">
                         <h4 className="font-medium">Man Utd vs Liverpool</h4>
-                        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-full">Active</span>
+                        <span className="text-xs px-2 py-1 bg-blue-900/20 text-blue-400 rounded-full">Active</span>
                       </div>
-                      <p className="text-sm text-gray-500 mb-3">Bet on: Draw</p>
+                      <p className="text-sm text-gray-400 mb-3">Bet on: Draw</p>
                       <div className="flex justify-between text-sm">
                         <div>
-                          <p className="text-gray-500">Amount</p>
+                          <p className="text-gray-400">Amount</p>
                           <p className="font-medium">$200.00</p>
                         </div>
                         <div>
-                          <p className="text-gray-500">Odds</p>
+                          <p className="text-gray-400">Odds</p>
                           <p className="font-medium">3.20</p>
                         </div>
                         <div>
-                          <p className="text-gray-500">Potential Win</p>
+                          <p className="text-gray-400">Potential Win</p>
                           <p className="font-medium text-green-500">$640.00</p>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div className="mt-6">
-                    <Button variant="ghost" size="sm" className="text-orange-500">
+                    <Button variant="ghost" size="sm" className="text-orange-500 hover:bg-gray-800">
                       View All Active Bets <ArrowUpRight className="ml-1 h-3 w-3" />
                     </Button>
                   </div>
@@ -199,15 +228,15 @@ export default function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="history">
-            <Card>
+            <Card className="bg-[#1a1a1a] border-gray-800">
               <CardHeader>
                 <CardTitle className="text-xl">Betting History</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border">
+                <div className="rounded-md border border-gray-800">
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="border-gray-800">
                         <TableHead>ID</TableHead>
                         <TableHead>Match</TableHead>
                         <TableHead>Bet On</TableHead>
@@ -219,7 +248,7 @@ export default function ProfilePage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
+                      <TableRow className="border-gray-800">
                         <TableCell className="font-medium">#BET1001</TableCell>
                         <TableCell>MI vs CSK</TableCell>
                         <TableCell>Mumbai Indians</TableCell>
@@ -231,7 +260,7 @@ export default function ProfilePage() {
                         <TableCell className="text-green-500">+$58.50</TableCell>
                         <TableCell className="text-gray-500 text-sm">May 8, 2023</TableCell>
                       </TableRow>
-                      <TableRow>
+                      <TableRow className="border-gray-800">
                         <TableCell className="font-medium">#BET1002</TableCell>
                         <TableCell>Barcelona vs Real Madrid</TableCell>
                         <TableCell>Barcelona</TableCell>
@@ -243,7 +272,7 @@ export default function ProfilePage() {
                         <TableCell className="text-red-500">-$25.00</TableCell>
                         <TableCell className="text-gray-500 text-sm">May 5, 2023</TableCell>
                       </TableRow>
-                      <TableRow>
+                      <TableRow className="border-gray-800">
                         <TableCell className="font-medium">#BET1003</TableCell>
                         <TableCell>Lakers vs Warriors</TableCell>
                         <TableCell>Lakers</TableCell>
@@ -255,7 +284,7 @@ export default function ProfilePage() {
                         <TableCell className="text-green-500">+$92.50</TableCell>
                         <TableCell className="text-gray-500 text-sm">May 3, 2023</TableCell>
                       </TableRow>
-                      <TableRow>
+                      <TableRow className="border-gray-800">
                         <TableCell className="font-medium">#BET1004</TableCell>
                         <TableCell>RCB vs SRH</TableCell>
                         <TableCell>Draw</TableCell>
@@ -267,7 +296,7 @@ export default function ProfilePage() {
                         <TableCell className="text-red-500">-$20.00</TableCell>
                         <TableCell className="text-gray-500 text-sm">May 1, 2023</TableCell>
                       </TableRow>
-                      <TableRow>
+                      <TableRow className="border-gray-800">
                         <TableCell className="font-medium">#BET1005</TableCell>
                         <TableCell>Arsenal vs Chelsea</TableCell>
                         <TableCell>Arsenal</TableCell>

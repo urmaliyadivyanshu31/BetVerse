@@ -17,25 +17,25 @@ import MatchInsightsWidget from "@/components/match-insights-widget"
 import AIBettingAssistant from "@/components/ai-betting-assistant"
 
 // Mock data for the match
-const matchData = {
+const matchData2 = {
   id: "CR1001",
   team1: {
-    name: "Mumbai Indians",
-    logo: "/team-logos/mi.png",
+    name: "Indians",
+    logo: "https://media-hosting.imagekit.io/74c4b80444da42e8/Board_of_Control_for_Cricket_in_India_Logo_(2024).svg?Expires=1841939589&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=uY5FGDDJG5EPp~foAYhNd-A21MuoY2K5AIC6s5Nchzacg6rHtDQhGt6nxHh6rTXyQwd5h8MHZJPiVX3WvsnRVF45w6mGk9uogeg918n-7CkvCgz9CgqU7PWKImB-WyLvU7Nx2xM8n-Ct2eqGKMHrBKZK9AfZgJEuzRm53xjnuztBoSFLB~lquabWPRrsXPPXUTni7t5fJIhRAoQMzKtrTGhrvAjMyxOvYfvbWmpS4wybE83RPF0~p3aNg4Rw4VowIJSYkfLc8FQK28QI4nMNBufuS4o6dpVGWkTtbg5Zsf9uxCEu3hPkjm7--hiAF1taqnG3FK440Phryk05wA5Vhw__",
     color: "blue",
     score: "142/3 (15.2)",
-    odds: "1.95",
+    odds: "3.89",
     recentForm: ["W", "W", "L", "W", "W"],
   },
   team2: {
-    name: "Chennai Super Kings",
-    logo: "/team-logos/csk.png",
+    name: "Australia",
+    logo: "https://media-hosting.imagekit.io/dbecdefbdee642d8/Cricket_Australia.png?Expires=1841939641&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=uPCW8E8sk8kL8F9Kqj1-0CUEQ94ua1MX9ga9ZYtEJK7SlE96eayzzzEWE5SlcYoEyCTR~nu-WAXdIlSxGRrZjcrd~x7vRR9UUNpgtho-dpFwIV3SrjP9xT2931ab7mdsC7AtYbf7zWL8HjzCsL8HAPwPHopFBdd47xAP6pl5KUfRACcjlFTfw~Qm-t-oaa2m-mVxtNjRLm-xNAUuuxsSbBsRMD5SuW42vNcQ5eZqvlz61ExlfJiamug~ulbkfKNCuAUxFCHdzYq--AnKYsUwCTBA7aNsbUIYBExY~xjbeOV19XY-hQt75RdkzDlu5sucYTOwkotWlgQu-AexYhzaKw__",
     color: "yellow",
     score: "Target: 186",
-    odds: "1.85",
+    odds: "2.25",
     recentForm: ["W", "L", "W", "L", "W"],
   },
-  drawOdds: "3.50",
+  drawOdds: "0.12",
   isLive: true,
   timeLeft: "32:15",
   venue: "Wankhede Stadium, Mumbai",
@@ -56,6 +56,45 @@ const matchData = {
     { name: "Ravindra Jadeja", team: "Chennai Super Kings", role: "All-rounder", image: "/players/jadeja.png" },
   ],
 }
+const matchData = {
+  id: "CR1002",
+  team1: {
+    name: "Royal Challengers Bangalore",
+    logo: "https://media-hosting.imagekit.io/c4a7bba832f34a56/screenshot_1747368167104.png?Expires=1841976170&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=pQq45~aYDwagu2TfBm1wwDBGSXuvjsZoe6o6~rZJYUsrEacaNWVVZvkh7YeDiIA3qugSWi4TBinen6KSSdOYMhtAsGCeTs7H8yMb7zn1y9BJfi1Xq-2swFsK-KsXoRKJbUQVB6VrBYAL~MONiP9kpItJRwgqE0BSkW2a2jCnCp8iIZZqEZZoqvSaEwS4nV9aNagGlAzcPlSwBhVDlDHGUke4K1Qd~HGV8P9GGMHFNmrkUh6~IO1WY4eonNPhLEcvLL7Azkg5GR0ZaALo1htV6lF82v7BM0pF3DVlIF2EhKp8ipAVW-ADUFvPUjJZo0lsBhfbdF1P~tK49KSCn29trQ__",
+    color: "#d62828",
+    score: "95/2 (10.3)",
+    odds: "2.10",
+    recentForm: ["W", "L", "W", "W", "L"],
+  },
+  team2: {
+    name: "Kolkata Knight Riders",
+    logo: "https://media-hosting.imagekit.io/a838787683514c69/screenshot_1747368176857.png?Expires=1841976179&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=EdkCjMM21IXOU2yfmdiBnIiI565nqDbo8QzngFQrxxpL2MEBIP0Bt0sUP1hypJdHFG80ANDIfadgMtIcJQbcv72lX0a2EO5yUS8FtmhLZvNqoBSrzQgTO8DJteA5h4Whkjs5kIdTTnt3LLJgW4p~TmJJ~wiyPU22jLCrump2AQ8kYT2SS0sNvJVyvW6bRxFX82Yyf9T4wMwZ~Rjm~92PArdiuoFVl2DOdr7LmMieR63wwg4Y2flD~H18z36KUOFaaX1H~2Vho6pgrWg4-fHdMYUlUJ5wYeG~W-9Sg-Ug2mcgbOEHI1KOLP-Jn3LSzdFPzlRQC0EaKwmOzOlf2sHdeg__",
+    color: "#862df2",
+    score: "Target: 175",
+    odds: "1.75",
+    recentForm: ["L", "W", "W", "L", "W"],
+  },
+  drawOdds: "0.11",
+  isLive: true,
+  timeLeft: "12:45",
+  venue: "M. Chinnaswamy Stadium",
+  tournament: "IPL 2024",
+  date: "May 16, 2024",
+  time: "20:00 IST",
+  liquidity: "$18,320",
+  popularity: 65,
+  headToHead: [
+    { date: "Apr 12, 2024", winner: "Kolkata Knight Riders", score: "KKR: 182/6, RCB: 167/8" },
+    { date: "Mar 28, 2023", winner: "Royal Challengers Bangalore", score: "RCB: 190/5, KKR: 176/7" },
+    { date: "May 3, 2022", winner: "Kolkata Knight Riders", score: "KKR: 169/4, RCB: 154/9" },
+  ],
+  keyPlayers: [
+    { name: "Virat Kohli", team: "Royal Challengers Bangalore", role: "Batsman", image: "https://media-hosting.imagekit.io/9de0de4fc09c4961/screenshot_1747368556485.png?Expires=1841976559&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Kmlj~RiRqAGTpegF0Y780SLJeVH8oIp~M9pMJlzluRkXgz5jIkAvryvd2BkRfYQ~ZtKnnfOgHIOzc82zJh4VmZFymz1Im5JcSBYEs0~kug1GiNsvum5uvuAu5~TUloBNfd8rXFpPORj~f6FJAm7VB7v~RmXVYbx-eHN4kAQxhSDf4Nx57jlUTCZuD068lpWp7rikrtVJpfUR1d2rbzdIv5O94ESWfL2BqjI1obtbr7vFApqlEqJKvadVZUVI3INC1c2Vtw4Co0qGZeNBkCFoRfx6pPxWyiUajiUSazZxrjLnbMZ6wQVeGIy6jc6M0WWXa1Y4B4tzDVQDnADaono1vQ__" },
+    { name: "Sunil Narine", team: "Kolkata Knight Riders", role: "All-rounder", image: "https://media-hosting.imagekit.io/20fe340e8ab742c9/screenshot_1747368571153.png?Expires=1841976574&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=MHwmhyaOr4KWP57~fW2vL1OitJWAgxuxoGbftT2Wx2fZtYD0zlB-rwqMgCDur-hQ5UpWnwPneJIoSEI~nY4RrgBjL8dXiiBpBHEhbZuesToi72yz0G8LznXA8RJeQIPqO6uUWk73m9SpUfSa6NhDELRDbdV0kUcj9BOls7HxNpoZ9dV5-JlipWdTcG6iaCltt8aRcat6~D61yo1kgUTXX4BmKG13cSY8R~EJI-tslndlTqeSdCHMW0x4aY7hGaL12nVHNlbQWHQ8NvHGYXwnwDJ8aVFmdL~HrvhH-ul9T9WJoYHWMZJDlCr1Sagwzv6Lxfzk3U0hcduzghih-rccGg__" },
+    { name: "Faf du Plessis", team: "Royal Challengers Bangalore", role: "Batsman", image: "https://media-hosting.imagekit.io/37b1a6203fe44e55/screenshot_1747368586583.png?Expires=1841976589&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=1mNy61gkf-ySW0v8mPmYpSvGc6KJF3NPl2Inzqz-GR1GhiHLWZqTa4qb8qdoAHz9dSx1hBZEXTvCCjdsADHW7Y1YUS4XeCDhWINVx-7PGxMF3vn~MnFI4U72kgrKf9ecdAmp3l5O5dvhnWTJWYthNuvqoPzFsTlxJznq507P9rBIf-WaH4IayGWetymP83-Eueg8MWm9QfHAWXQWzeK99Y48NqfT~fDspkBMyJ2tsT8pJSTiIVUwMlG1kd8PCRav7YPwXLWwBstYzE-FLrP2EWYmx8XZfLVKgB7kX2rO0Uz1bf3j27iT7Jjz0loHMAiHX5X6cRoSMx-wBDj847Z6Lg__" },
+    { name: "Andre Russell", team: "Kolkata Knight Riders", role: "All-rounder", image: "https://media-hosting.imagekit.io/a636494163b74a20/screenshot_1747368602871.png?Expires=1841976606&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=VbNg0d-tGN2xLTPhV2vfySnnnZDYyRTQ6XghfvQGj~OYRRHqHGEwu3hOjCJK5FHHL~8IMFNUiei~zwsLLLFF1WdqZVH3tl~OTTb9v9JGncUOJ8vgMtxzr5XqaskPQpnSFg~8WFpnoy-BsRPonUIZQXb4kP48skhtNvTFv7xBe-zA7VBikAdyts80LXHJEgIRBQMMggYz1CTzBkWR5FRi0oXYqTC4DkYjttVvE6u4N4WjMaM-xAv~sscktruGYUtYqEKZrBExKeuV8yQ2b0IxG0NaFjNnnKJEgrZmF~7uZiaHYU75j88mS2GJy0cd~DFjncLSF6Fs27XoK6hve9uj0g__" },
+  ],
+};
 
 export default function MatchDetailsPage({ params }: { params: { id: string } }) {
   const { isConnected, placeBet } = useWallet()
