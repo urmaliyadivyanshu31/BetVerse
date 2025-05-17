@@ -1,0 +1,7 @@
+
+
+[programs.localnet]
+amm_demo = "AMMDEMo11111111111111111111111111111111111111"
+
+[registry]
+url = "https://anchor.projectserum.com"

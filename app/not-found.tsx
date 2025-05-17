@@ -1,11 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 
 export default function NotFound() {
-  const [stars, setStars] = useState<{ x: number; y: number; size: number }[]>([]);
+  const [stars, setStars] = useState<{ x: number; y: number; size: number }[]>(
+    []
+  );
 
   useEffect(() => {
     // Generate random stars
@@ -20,6 +24,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center relative overflow-hidden">
       {/* Stars background */}
+      <Navbar />
       {stars.map((star, index) => (
         <motion.div
           key={index}
@@ -56,7 +61,9 @@ export default function NotFound() {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <h2 className="text-2xl mb-8">Houston, we have a problem!</h2>
-          <p className="text-gray-400 mb-8">The page you're looking for is lost in space.</p>
+          <p className="text-gray-400 mb-8">
+            The page you're looking for is lost in space.
+          </p>
         </motion.div>
 
         <motion.div
@@ -64,7 +71,7 @@ export default function NotFound() {
           animate={{ scale: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Link 
+          <Link
             href="/"
             className="inline-block bg-white text-black px-8 py-3 rounded-full font-semibold hover:bg-gray-200 transition-colors"
           >
@@ -88,6 +95,7 @@ export default function NotFound() {
           <div className="text-6xl">👨‍🚀</div>
         </motion.div>
       </div>
+      <Footer />
     </div>
   );
 }

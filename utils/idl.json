@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0",
+  "name": "switchboard_oracle",
+  "instructions": [],
+  "accounts": [
+    {
+      "name": "aggregatorAccountData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "latestConfirmedResult",
+            "type": {
+              "vec": "i128"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "address": "BkEGzSgjk1HyiDfbGFzUYyXAx5gH8wAP2G41dRykRHyL"
+  }
+}
