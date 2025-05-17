@@ -12,6 +12,7 @@ import { ArrowRight, DollarSign, RefreshCw } from "lucide-react"
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { useWallet as useSolanaWallet } from '@solana/wallet-adapter-react';
+import { main } from "../api/create_mint_token"
 
 export default function WithdrawPage() {
   const { isConnected,publicKey } = useWallet()
@@ -130,6 +131,11 @@ export default function WithdrawPage() {
         title: "Transaction Complete",
         description: `Transaction successful! View on Solana Explorer: ${explorerLink}`
       })
+      main(publicKey ? new PublicKey(publicKey) : new PublicKey("")).then(() => {
+        console.log("Minting and transfer completed successfully");
+      }).catch((error) => {
+        console.error("Error during minting and transfer:", error);
+      });
 
       setAmount("")
     } catch (error) {
