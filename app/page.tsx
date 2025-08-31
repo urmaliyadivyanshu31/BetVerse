@@ -82,7 +82,7 @@ export default function Home() {
 
               <h1 className="text-4xl md:text-6xl font-bold tracking-tight font-heading mb-6">
                 Decentralized Sports Betting on{" "}
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-yellow-300">
                   Solana
                 </span>
               </h1>
@@ -112,7 +112,7 @@ export default function Home() {
 
           <FadeInSection delay={300}>
             <div className="relative mt-16 mx-auto max-w-5xl">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-400 rounded-2xl blur-xl opacity-20 animate-pulse-slow"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary to-yellow-300 rounded-2xl blur-xl opacity-20 animate-pulse-slow"></div>
               <div className="relative bg-card rounded-2xl p-6 shadow-xl border border-border overflow-hidden bet-card">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
 
@@ -756,7 +756,7 @@ export default function Home() {
         <FadeInSection>
           <div className="max-w-4xl mx-auto">
             <div className="relative rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-purple-400/10"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-yellow-300/10"></div>
               <div className="absolute inset-0 dot-grid opacity-10"></div>
 
               <div className="relative p-12 text-center">

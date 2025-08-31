@@ -61,6 +61,19 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        yellow: {
+          50: '#fefce8',
+          100: '#fef9c3',
+          200: '#fef08a',
+          300: '#fde047',
+          400: '#facc15',
+          500: '#eab308',
+          600: '#ca8a04',
+          700: '#a16207',
+          800: '#854d0e',
+          900: '#713f12',
+          950: '#422006',
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -82,10 +95,10 @@ const config = {
         },
         glow: {
           "0%, 100%": {
-            boxShadow: "0 0 5px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.3)",
+            boxShadow: "0 0 5px rgba(250, 204, 21, 0.5), 0 0 20px rgba(250, 204, 21, 0.3)",
           },
           "50%": {
-            boxShadow: "0 0 15px rgba(139, 92, 246, 0.8), 0 0 30px rgba(139, 92, 246, 0.5)",
+            boxShadow: "0 0 15px rgba(250, 204, 21, 0.8), 0 0 30px rgba(250, 204, 21, 0.5)",
           },
         },
         pulse: {
